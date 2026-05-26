@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Drive Research Manager</title>
 
 <style>
+
 body{
 font-family:Arial;
 background:#111827;
 color:white;
-padding:20px;
 margin:0;
+padding:20px;
 }
 
 h1{
@@ -26,69 +30,101 @@ margin-bottom:20px;
 }
 
 button,input{
+
 padding:10px;
 border:none;
 border-radius:10px;
+
 }
 
 button{
-cursor:pointer;
+
 background:#2563eb;
 color:white;
+cursor:pointer;
+
 }
 
 button:hover{
+
 background:#1d4ed8;
+
 }
 
 #cards{
+
 display:grid;
+
 grid-template-columns:
-repeat(auto-fill,minmax(250px,1fr));
+repeat(
+auto-fill,
+minmax(250px,1fr)
+);
+
 gap:15px;
+
 }
 
 .card{
-background:#1f2937;
-padding:15px;
-border-radius:15px;
-box-shadow:0 0 8px black;
-}
 
-.card h3{
-word-break:break-word;
+background:#1f2937;
+
+padding:15px;
+
+border-radius:15px;
+
+box-shadow:
+0 0 10px black;
+
 }
 
 .small{
+
 opacity:.7;
+
 font-size:12px;
+
 }
 
 .actions{
+
 display:flex;
+
 gap:8px;
+
 margin-top:10px;
+
 flex-wrap:wrap;
+
 }
 
 .rename{
+
 background:#eab308;
+
 }
 
 .delete{
+
 background:#dc2626;
+
 }
 
 .download{
+
 background:#16a34a;
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<h1>Drive Research Manager</h1>
+<h1>
+Drive Research Manager
+</h1>
 
 <div class="top">
 
@@ -96,25 +132,38 @@ background:#16a34a;
 Login Google
 </button>
 
-<input type="file" id="upload">
+<input
+type="file"
+id="upload"
+>
 
 <button id="refresh">
+
 Refresh
+
 </button>
 
 </div>
 
 <div id="cards"></div>
 
-<script src="https://accounts.google.com/gsi/client"></script>
-<script src="https://apis.google.com/js/api.js"></script>
+<script
+src=
+"https://accounts.google.com/gsi/client"
+></script>
+
+<script
+src=
+"https://apis.google.com/js/api.js"
+></script>
 
 <script>
 
 const CLIENT_ID=
 "1059917357836-7oop4rls49pto8fil203qkgab9vpe2eo.apps.googleusercontent.com"
+
 const API_KEY=
-"AIzaSyDnnnWIj9RUJPFYj4qztAZD1B65wc2N8_k"
+"PUT_NEW_KEY"
 
 const DISCOVERY=
 "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"
@@ -122,83 +171,75 @@ const DISCOVERY=
 const SCOPES=
 "https://www.googleapis.com/auth/drive"
 
+let tokenClient
 let token=""
 
-async function init(){
+window.onload=()=>{
 
-await gapi.load("client",async()=>{
+gapi.load(
 
-await gapi.client.init({
-apiKey:API_KEY,
-discoveryDocs:[DISCOVERY]
-})
+"client",
 
-})
-
-google.accounts.oauth2.initTokenClient({
-
-client_id:CLIENT_ID,
-
-scope:SCOPES,
-
-callback:(resp)=>{
-
-token=resp.access_token
-
-loadFiles()
-
-}
-
-})
-
-}
-
-let tokenClient
-
-window.onload=async()=>{
-
-await gapi.load("client")
+async()=>{
 
 await gapi.client.init({
 
 apiKey:API_KEY,
-discoveryDocs:[DISCOVERY]
+
+discoveryDocs:[
+DISCOVERY
+]
 
 })
 
 tokenClient=
+
 google.accounts.oauth2.initTokenClient({
 
-client_id:CLIENT_ID,
+client_id:
+CLIENT_ID,
 
-scope:SCOPES,
+scope:
+SCOPES,
 
 callback:(resp)=>{
 
-token=resp.access_token
+token=
+resp.access_token
 
 loadFiles()
 
 }
 
 })
+
+}
+
+)
 
 }
 
 login.onclick=()=>{
 
-tokenClient.requestAccessToken()
+tokenClient
+.requestAccessToken()
 
 }
 
-refresh.onclick=loadFiles
+refresh.onclick=
+loadFiles
 
-upload.onchange=uploadFile
+upload.onchange=
+uploadFile
 
 async function loadFiles(){
 
+try{
+
 const r=
-await gapi.client.drive.files.list({
+
+await
+gapi.client.drive.files.list({
 
 pageSize:100,
 
@@ -207,7 +248,23 @@ fields:
 
 })
 
-render(r.result.files)
+render(
+
+r.result.files
+
+)
+
+}
+
+catch(e){
+
+console.log(e)
+
+alert(
+"login first"
+)
+
+}
 
 }
 
@@ -217,47 +274,85 @@ cards.innerHTML=""
 
 files.forEach(file=>{
 
-let c=document.createElement("div")
+const c=
+document
+.createElement("div")
 
-c.className="card"
+c.className=
+"card"
 
-c.innerHTML=`
+c.innerHTML=
 
-<h3>${file.name}</h3>
+`
 
-<div class=small>
-${format(file.size)}
+<h3>
+
+${file.name}
+
+</h3>
+
+<div class="small">
+
+${format(
+file.size
+)}
+
 </div>
 
-<div class=small>
+<div class="small">
+
 ${new Date(
 file.modifiedTime
 ).toLocaleString()}
+
 </div>
 
-<div class=actions>
+<div class="actions">
 
 <button
-class=download
-onclick="downloadFile('${file.id}')">
-Download
-</button>
 
-<button
-class=rename
-onclick="renameFile(
-'${file.id}',
-'${file.name}'
-)">
-Rename
-</button>
+class="download"
 
-<button
-class=delete
-onclick="deleteFile(
+onclick=
+"downloadFile(
 '${file.id}'
-)">
+)"
+
+>
+
+Download
+
+</button>
+
+<button
+
+class="rename"
+
+onclick=
+"renameFile(
+'${file.id}',
+\`${file.name}\`
+)"
+
+>
+
+Rename
+
+</button>
+
+<button
+
+class="delete"
+
+onclick=
+"deleteFile(
+'${file.id}'
+)"
+
+>
+
 Delete
+
 </button>
 
 </div>
@@ -272,16 +367,22 @@ cards.appendChild(c)
 
 async function uploadFile(){
 
-let file=
+const file=
+
 upload.files[0]
 
-if(!file)return
+if(!file)
+return
 
 const meta={
-name:file.name
+
+name:
+file.name
+
 }
 
-let form=
+const form=
+
 new FormData()
 
 form.append(
@@ -289,12 +390,18 @@ form.append(
 "metadata",
 
 new Blob(
+
 [
-JSON.stringify(meta)
+JSON.stringify(
+meta
+)
 ],
 
 {
-type:"application/json"
+
+type:
+"application/json"
+
 }
 
 )
@@ -302,8 +409,11 @@ type:"application/json"
 )
 
 form.append(
+
 "file",
+
 file
+
 )
 
 await fetch(
@@ -312,14 +422,19 @@ await fetch(
 
 {
 
-method:"POST",
+method:
+"POST",
 
 headers:{
+
 Authorization:
+
 "Bearer "+token
+
 },
 
-body:form
+body:
+form
 
 }
 
@@ -331,7 +446,12 @@ loadFiles()
 
 async function deleteFile(id){
 
-if(!confirm("delete?"))
+if(
+!confirm(
+"Delete?"
+)
+)
+
 return
 
 await fetch(
@@ -340,11 +460,13 @@ await fetch(
 
 {
 
-method:"DELETE",
+method:
+"DELETE",
 
 headers:{
 
 Authorization:
+
 "Bearer "+token
 
 }
@@ -357,15 +479,26 @@ loadFiles()
 
 }
 
-async function renameFile(id,name){
+async function renameFile(
 
-let newName=
+id,
+
+oldName
+
+){
+
+const newName=
+
 prompt(
-"new name",
-name
+
+"New name",
+
+oldName
+
 )
 
-if(!newName)return
+if(!newName)
+return
 
 await fetch(
 
@@ -373,22 +506,27 @@ await fetch(
 
 {
 
-method:"PATCH",
+method:
+"PATCH",
 
 headers:{
 
 Authorization:
+
 "Bearer "+token,
 
 "Content-Type":
+
 "application/json"
 
 },
 
 body:
+
 JSON.stringify({
 
-name:newName
+name:
+newName
 
 })
 
@@ -413,29 +551,50 @@ window.open(
 function format(bytes){
 
 if(!bytes)
-return "?"
+
+return
+"?"
 
 bytes=
 Number(bytes)
 
 const units=
-["B","KB","MB","GB"]
+
+[
+"B",
+"KB",
+"MB",
+"GB"
+]
 
 let i=0
 
 while(
-bytes>1024
-&& i<3
+
+bytes>=1024
+
+&&
+
+i<3
+
 ){
 
 bytes/=1024
+
 i++
 
 }
 
 return
+
 bytes.toFixed(1)
-+" "+
+
++
+
+" "
+
++
+
 units[i]
 
 }
@@ -443,4 +602,5 @@ units[i]
 </script>
 
 </body>
+
 </html>
