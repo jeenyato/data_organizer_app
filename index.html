@@ -217,7 +217,13 @@
             <div class="backheader">
                 <button>رجوع</button>
             </div>
-
+            ...
+        </div>
+        <div id="imageviewer">
+            <div class="backheader">
+                <button>رجوع</button>
+            </div>
+            ...
         </div>
     <script>
         const CLIENT_ID="1059917357836-7oop4rls49pto8fil203qkgab9vpe2eo.apps.googleusercontent.com"
@@ -259,11 +265,16 @@
                         tokenExpire=expireTime;
                         localStorage.setItem("drive_token",token);
                         localStorage.setItem("drive_token_expire",expireTime);
+                        tokenClient.requestAccessToken({
+                            prompt:""
+                        });
                         loadFiles();
                     }
                 })
                 if(token && Date.now()<tokenExpire){
-                    loadFiles();
+                    tokenClient.requestAccessToken({
+                        prompt:""
+                    });
                 }
                 setTimeout(()=>{
                     document.getElementById("loader").style.display="none";
@@ -366,8 +377,10 @@
             loadFiles()
         }
         setInterval(()=>{
-            if(token && Date.now() > tokenExpire - 60000){
-                tokenClient.requestAccessToken({prompt:""});
+            if(tokenClient &&token &&Date.now() > tokenExpire - 60000){
+                tokenClient.requestAccessToken({
+                    prompt:""
+                });
             }
         },30000);
         upload.onchange=uploadFile
@@ -466,6 +479,9 @@
         async function renameFile(id,oldName){
             const newName=prompt("New name",oldName)
             if(!newName){return}
+            if(newName===oldName){return}
+            document.getElementById("loader").style.display="flex";
+            document.getElementById("content1").style.display="none";
             await fetch(`https://www.googleapis.com/drive/v3/files/${id}`,
                 {
                     method:"PATCH",
@@ -476,6 +492,8 @@
                     body:JSON.stringify({name:newName})
                 }
             )
+            document.getElementById("loader").style.display="none";
+            document.getElementById("content1").style.display="block";
             loadFiles()
         }
         function downloadFile(id){
