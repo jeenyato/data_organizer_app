@@ -362,9 +362,10 @@
                     <div class="small">${format(file.size)}</div>
                     <div class="small">${new Date(file.modifiedTime).toLocaleString()}</div>
                     <div class="actions">
-                        <button class="download" onclick="downloadFile('${file.id}')">Download</button>
-                        <button class="rename" onclick="renameFile('${file.id}',\`${file.name}\`)">Rename</button>
-                        <button class="delete" onclick="deleteFile('${file.id}')">Delete</button>
+                        <button class="download" onclick="downloadFile('${file.id}')">تحميل</button>
+                        <button class="rename" onclick="renameFile('${file.id}',\`${file.name}\`)">غير الاسم</button>
+                        <button class="delete" onclick="deleteFile('${file.id}')">حذف</button>
+                        <button class="edit" onclick="window.open('https://docs.google.com/document/d/${file.id}/edit')">تعديل</button>
                     </div>`
                 cards.appendChild(c)
             })
