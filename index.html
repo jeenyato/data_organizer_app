@@ -254,6 +254,8 @@
             localStorage.removeItem("drive_token");
             localStorage.removeItem("drive_token_expire");
             token="";
+            tokenExpire=0;
+            gapi.client.setToken("");
         }
         async function initialize(){
             try{
@@ -265,16 +267,17 @@
                         tokenExpire=expireTime;
                         localStorage.setItem("drive_token",token);
                         localStorage.setItem("drive_token_expire",expireTime);
-                        tokenClient.requestAccessToken({
-                            prompt:""
+                        gapi.client.setToken({
+                            access_token:token
                         });
                         loadFiles();
                     }
                 })
                 if(token && Date.now()<tokenExpire){
-                    tokenClient.requestAccessToken({
-                        prompt:""
+                    gapi.client.setToken({
+                        access_token:token
                     });
+                    loadFiles();
                 }
                 setTimeout(()=>{
                     document.getElementById("loader").style.display="none";
@@ -377,10 +380,14 @@
             loadFiles()
         }
         setInterval(()=>{
-            if(tokenClient &&token &&Date.now() > tokenExpire - 60000){
-                tokenClient.requestAccessToken({
-                    prompt:""
-                });
+            try{
+                if(tokenClient &&token &&Date.now() > tokenExpire - 60000){
+                    tokenClient.requestAccessToken({
+                        prompt:""
+                    });
+                }
+            }catch(e){
+                console.log("silent refresh failed");
             }
         },30000);
         upload.onchange=uploadFile
