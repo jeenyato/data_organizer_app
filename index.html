@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"content="width=device-width,initial-scale=1">
     <title>Drive Research Manager</title>
+    <script type="module">import 'https://unpkg.com/mathlive';</script>
     <style>
         *{
             margin:0;
@@ -53,6 +54,22 @@
             color:white;
             margin:0;
             padding: 0;
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+        header{
+            padding:14px;
+            background:#1f2937;
+            font-size:20px;
+            font-weight:bold;
+            border-bottom:1px solid #374151;
+        }
+        .toolbar{
+            padding:10px;
+            display:flex;
+            gap:10px;
+            background:#1f2937;
         }
         h1{
             text-align:center;
@@ -113,6 +130,50 @@
             padding: 0px;
             margin: 0;
         }
+        .buttoniniditor{
+            border:none;
+            background:#2563eb;
+            color:white;
+            padding:10px 14px;
+            border-radius:10px;
+            font-size:15px;
+        }
+        #editor{
+            flex:1;
+            padding:18px;
+            outline:none;
+            overflow:auto;
+            font-size:18px;
+            line-height:1.7;
+        }
+        #editor:empty::before{
+            content:"ابدأ بالكتابة هنا...";
+            color:#6b7280;
+        }
+        .equation{
+            display:inline-block;
+            padding:4px 6px;
+            margin:0 3px;
+            background:#1f2937;
+            border-radius:8px;
+        }
+        #equationPanel{
+            background:#1f2937;
+            padding:18px;
+            border-top:2px solid #374151;
+            display:none;
+        }
+        math-field{
+            width:100%;
+            font-size:28px;
+            padding:12px;
+            border-radius:10px;
+            margin-bottom:12px;
+        }
+        .insert{
+            width:100%;
+            background:#16a34a;
+        }
     </style>
 </head>
 <body>
@@ -141,16 +202,15 @@
     <div id="content2" style="display:none;">
         <header>📜محرر نصوص للبحث</header>
             <div class="toolbar">
-                <button onclick="openEquation()">+ معادله</button>
-                <button onclick="savealldata()" style="background: #16a34a;">احفظ</button>
-                <button onclick="savealldata()" style="background:crimson;">امسح</button>
-                <button onclick="undothat()" style="background:darkorange;">تراجع خطوه</button>
-                
+                <button class="buttoniniditor" onclick="openEquation()">+ معادله</button>
+                <button class="buttoniniditor" onclick="savealldata()" style="background: #16a34a;">احفظ</button>
+                <button class="buttoniniditor" onclick="salldata()" style="background:crimson;">امسح</button>
+                <button class="buttoniniditor" onclick="undothat()" style="background:darkorange;">تراجع خطوه</button>
             </div>
             <div id="editor" contenteditable="true"></div>
             <div id="equationPanel">
                 <math-field id="mathInput">\frac{a}{b}</math-field>
-                <button class="insert" onclick="insertEquation()">اضافه المعادله</button>
+                <button class="buttoniniditor insert" onclick="insertEquation()">اضافه المعادله</button>
             </div>
         </div>
     <script>
@@ -198,6 +258,13 @@
             document.getElementById("content1").style.display="none";
             document.getElementById("content2").style.display="block";
         }
+        function salldata(){
+            if(confirm("هل أنت متأكد من مسح كل المحتوى؟")){
+                editor.innerHTML="";
+                document.getElementById("content1").style.display="block";
+                document.getElementById("content2").style.display="none";
+            }
+        }
         async function savealldata(){
             if(!token){
                 alert("سجل دخول الأول");
@@ -211,7 +278,7 @@
             const form = new FormData();
             form.append("metadata",new Blob([JSON.stringify({name:"بحث جديد.html"})],{type:"application/json"}));
             form.append("file",blob,"بحث جديد.html");
-            document.getElementById("loader").style.display="block";
+            document.getElementById("loader").style.display="flex";
             document.getElementById("content2").style.display="none";
             await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
                 {
@@ -310,7 +377,7 @@
             const form=new FormData()
             form.append("metadata",new Blob([JSON.stringify(meta)],{type:"application/json"}))
             form.append("file",file)
-            document.getElementById("loader").style.display="block";
+            document.getElementById("loader").style.display="flex";
             document.getElementById("content1").style.display="none";
             await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
                 {
