@@ -275,6 +275,44 @@
             border-bottom:2px solid #334155;
             white-space:nowrap;
         }
+        #floatingMenu{
+            position:fixed;
+            
+            top:100px;
+            right:30px;
+            width:220px;
+            background:#1e293b;
+            border-radius:16px;
+            padding:15px;
+            box-shadow:0 0 20px rgba(0,0,0,0.4);
+            display:none;
+            z-index:9999;
+            animation:showmenu .2s ease;
+        }
+        #floatingMenu button{
+            width:100%;
+            padding:12px;
+            margin-top:10px;
+            border:none;
+            border-radius:10px;
+            background:#334155;
+            color:white;
+            cursor:pointer;
+            transition:.2s;
+        }
+        #floatingMenu button:hover{
+            background:#475569;
+        }
+        @keyframes showmenu{
+            from{
+                opacity:0;
+                transform:translateY(-10px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
         .realtable td{
             padding:12px;
             border-bottom:1px solid #334155;
@@ -320,7 +358,18 @@
                         <center>
                             <button id="login" style="width: 32%;">سجل دخول</button>
                             <button id="refresh" style="width: 32%;">تحديث</button>
-                            <button id="edit_emw_file" style="width: 32%;">إنشاء ملف</button>
+                            <button id="mainBtn" style="width: 32%;">إنشاء ملف</button>
+                            <div id="floatingMenu">
+                                <button id="edit_emw_file_text">
+                                    ملف نصوص و معادلات
+                                </button>
+                                <button id="edit_emw_file_link">
+                                    ملف روابط لملف خارجي
+                                </button>
+                                <button id="edit_emw_file_csv">
+                                    ملف جداول بيانات
+                                </button>
+                            </div>
                         </center>
                     </div><br>
                     <input type="file" id="upload"><br><br>
@@ -480,7 +529,23 @@
                 alert("Init failed")
             }
         }
-        edit_emw_file.onclick=()=>{
+        document.addEventListener("click",(e)=>{
+            if(!menu.contains(e.target)&&e.target !== mainBtn){
+                menu.style.display = "none";
+            }
+        });
+        mainBtn.onclick=()=>{
+            if(!token){
+                alert("سجل دخول الأول");
+                return;
+            }
+            if(menu.style.display === "block"){
+                menu.style.display = "none";
+            }else{
+                menu.style.display = "block";
+            }
+        }
+        edit_emw_file_text.onclick=()=>{
             if(!token){
                 alert("سجل دخول الأول");
                 return;
@@ -700,6 +765,12 @@
                 console.error(e);
                 alert("فشل فتح CSV");
             }
+        }
+        edit_emw_file_link.onclick=()=>{
+            // LINK 
+        }
+        edit_emw_file_csv.onclick=()=>{
+            // LINK 
         }
         function escapeHTML(str){
             return str
