@@ -100,6 +100,76 @@
             grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
             gap:15px;
         }
+        .viewer{
+            position:fixed;
+            inset:0;
+            width:100%;
+            height:100%;
+            background:#0f172a;
+            z-index:9999;
+            display:none;
+            flex-direction:column;
+        }
+        .backheader{
+            height:60px;
+            padding:10px;
+            background:#111827;
+            border-bottom:1px solid #374151;
+            display:flex;
+            align-items:center;
+        }
+        .backheader button{
+            background:#2563eb;
+            color:white;
+            border:none;
+            padding:10px 18px;
+            border-radius:12px;
+            font-size:16px;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .backheader button:hover{
+            background:#1d4ed8;
+        }
+        .viewercontent{
+            flex:1;
+            overflow:hidden;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:10px;
+        }
+        #pdfFrame{
+            width:100%;
+            height:100%;
+            border:none;
+            border-radius:12px;
+            background:white;
+        }
+        .imagecontent{
+            overflow:auto;
+        }
+        #viewedImage{
+            max-width:100%;
+            max-height:100%;
+            object-fit:contain;
+            border-radius:12px;
+        }
+        @media(max-width:768px){
+            .backheader{
+                height:55px;
+                padding:8px;
+            }
+            .backheader button{
+                width:100%;
+                font-size:15px;
+                padding:12px;
+                border-radius:10px;
+            }
+            .viewercontent{
+                padding:5px;
+            }
+        }
         .card{
             background:#1f2937;
             padding:15px;
@@ -213,17 +283,25 @@
                 <button class="buttoniniditor insert" onclick="insertEquation()">اضافه المعادله</button>
             </div>
         </div>
-        <div id="pdfviewer" style="display:none;">
+        <div id="pdfviewer" class="viewer" style="display: none;">
             <div class="backheader">
-                <button>رجوع</button>
+                <button onclick="closeViewer('pdfviewer')">
+                    ⬅ رجوع
+                </button>
             </div>
-            ...
+            <div class="viewercontent">
+                <iframe id="pdfFrame"src=""frameborder="0"></iframe>
+            </div>
         </div>
-        <div id="imageviewer">
+        <div id="imageviewer" class="viewer" style="display: none;">
             <div class="backheader">
-                <button>رجوع</button>
+                <button onclick="closeViewer('imageviewer')">
+                    ⬅ رجوع
+                </button>
             </div>
-            ...
+            <div class="viewercontent imagecontent">
+                <img id="viewedImage" src="" alt="الصورة">
+            </div>
         </div>
     <script>
         const CLIENT_ID="1059917357836-7oop4rls49pto8fil203qkgab9vpe2eo.apps.googleusercontent.com"
@@ -236,6 +314,16 @@
         let googleReady=false
         let gapiReady=false
         let initiolized=false
+        function closeViewer(id){
+            document.getElementById(id).style.display="none";
+            if(id==="pdfviewer"){
+                document.getElementById("pdfFrame").src="";
+            }
+            if(id==="imageviewer"){
+                document.getElementById("viewedImage").src="";
+            }
+            document.getElementById("content1").style.display="block";
+        }
         function ready(){
             if(googleReady&&gapiReady&&!initiolized){
                 initiolized=true
@@ -424,7 +512,28 @@
                 cards.appendChild(c)
             })
         }
+        function openPDF(url){
+            document.getElementById("loader").style.display="none";
+            document.getElementById("pdfviewer").style.display="flex";
+            document.getElementById("pdfFrame").src=url;
+        }
+        function openImage(url){
+            document.getElementById("loader").style.display="none";
+            document.getElementById("imageviewer").style.display="flex";
+            document.getElementById("viewedImage").src=url;
+        }
         async function openfile(id,name){
+            const fileUrl=`https://www.googleapis.com/drive/v3/files/${id}?alt=media`;
+            if(name.endsWith(".png")||name.endsWith(".jpg")||name.endsWith(".jpeg")||name.endsWith(".svg")){
+                document.getElementById("loader").style.display="flex";
+                openImage(fileUrl + "&access_token=" + token);
+                return;
+            }
+            if(name.endsWith(".pdf")){
+                document.getElementById("loader").style.display="flex";
+                openPDF(fileUrl + "&access_token=" + token);
+                return;
+            }
             if(name.endsWith(".txt")){
                 try{
                     document.getElementById("loader").style.display="flex";
@@ -439,6 +548,7 @@
                     const text=await response.text();
                     editor.innerHTML=text;
                     document.getElementById("content2").style.display="block";
+                    return;
                 }catch(e){
                     console.error(e);
                     alert("فشل فتح الملف");
@@ -473,6 +583,8 @@
         }
         async function deleteFile(id){
             if(!confirm("Delete?")){return}
+            document.getElementById("loader").style.display="flex";
+            document.getElementById("content1").style.display="none";
             await fetch(`https://www.googleapis.com/drive/v3/files/${id}`,
                 {
                     method:"DELETE",
@@ -481,6 +593,8 @@
                     }
                 }
             )
+            document.getElementById("loader").style.display="none";
+            document.getElementById("content1").style.display="block";
             loadFiles()
         }
         async function renameFile(id,oldName){
