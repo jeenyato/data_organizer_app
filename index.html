@@ -470,18 +470,10 @@
     </div>
     <div id="csvviewer" class="viewer" style="display:none;">
         <div class="backheader">
-            <button class="csvbutomstops delete" onclick="closeViewer('csvviewer')" >
-                رجوع
-            </button>
-            <button class="csvbutomstops" onclick="saveCSV()" style="background:#16a34a;">
-                حفظ
-            </button>
-            <button class="csvbutomstops rename">
-                +صف
-            </button>
-            <button class="csvbutomstops rename">
-                +عامود
-            </button>
+            <button class="csvbutomstops delete" onclick="closeViewer('csvviewer')" >رجوع</button>
+            <button class="csvbutomstops" onclick="saveCSV()" style="background:#16a34a;">حفظ</button>
+            <button class="csvbutomstops rename" id="addRowBtn">+صف</button>
+            <button class="csvbutomstops rename" id="addColBtn">+عامود</button>
         </div>
         <div class="viewercontent csvcontent">
             <div id="csvTable"></div>
@@ -854,6 +846,36 @@
             document.getElementById("loader").style.display="none";
             document.getElementById("content1").style.display="block";
             loadFiles();
+        }
+        document.getElementById("addRowBtn").onclick=()=>{
+            const table=document.querySelector(".realtable");
+            if(!table){return;}
+            const tbody=table.querySelector("tbody");
+            const cols=table.querySelectorAll("thead th").length;
+            const tr=document.createElement("tr");
+            for(let i=0;i<cols;i++){
+                const td=document.createElement("td");
+                td.contentEditable="true";
+                td.innerHTML="";
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+        document.getElementById("addColBtn").onclick=()=>{
+            const table=document.querySelector(".realtable");
+            if(!table){return;}
+            const headRow=table.querySelector("thead tr");
+            const th=document.createElement("th");
+            th.contentEditable="true";
+            th.innerText="عامود جديد";
+            headRow.appendChild(th);
+            const rows=table.querySelectorAll("tbody tr");
+            rows.forEach(row=>{
+                const td=document.createElement("td");
+                td.contentEditable="true";
+                td.innerHTML="";
+                row.appendChild(td);
+            });
         }
         async function openCSV(id){
             try{
