@@ -256,7 +256,6 @@
             border:1px solid #334155;
         }
         .realtable{
-            width:100%;
             border-collapse:collapse;
             min-width:700px;
             background:#111827;
@@ -277,7 +276,6 @@
         }
         #floatingMenu{
             position:fixed;
-            
             top:100px;
             right:30px;
             width:220px;
@@ -775,7 +773,7 @@
                 alert("فشل تشغيل الصوت");
             }
         }
-        async function saveCSV(){ //NOTE 
+        async function saveCSV(){
             const table=document.querySelector(".realtable");
             let csv=[];
             for(const row of table.rows){
